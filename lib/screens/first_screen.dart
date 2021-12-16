@@ -26,72 +26,74 @@ class _FirstScreenState extends State<FirstScreen> {
         ],
       ),
       body: Center(
-        child: Column(
-          children: [
-            Obx(() => page.loading.value
-                    ? SizedBox(
-                        height: Get.mediaQuery.size.height * 0.7,
-                        child: const Center(child: CircularProgressIndicator()))
-                    : CarouselSlider.builder(
-                        itemCount: page.list.length,
-                        itemBuilder: (context, index, realIndex) {
-                          return Container(
-                            margin: const EdgeInsets.symmetric(horizontal: 12),
-                            // color: Colors.red,
-                            child: InkWell(
-                              onTap: () {
-                                Get.to(
-                                    () => SecondScreen(
-                                          photo: page.list[index],
-                                        ),
-                                    duration: const Duration(milliseconds: 300),
-                                    transition: Transition.fade);
-                              },
-                              child: Hero(
-                                tag: '${page.list[index].id}',
-                                child: Image.network(
-                                    'https://live.staticflickr.com/${page.list[index].server}/${page.list[index].id}_${page.list[index].secret}.jpg'),
-                              ),
-                            ),
-                          );
-                        },
-                        options: CarouselOptions(
+        child: Obx(
+          () => page.connected.value
+              ? Column(
+                  children: [
+                    page.loading.value
+                        ? SizedBox(
                             height: Get.mediaQuery.size.height * 0.7,
-                            enableInfiniteScroll: false))
-                // Column(
-                //         children: List.generate(page.list.length,
-                //             (index) => Text(page.list[index].title ?? '')),
-                //       ),
-                ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Obx(
-                  () => Container(
-                    margin: const EdgeInsets.all(10),
-                    child: ElevatedButton.icon(
-                        onPressed: page.page.value == 1
-                            ? null
-                            : () {
-                                page.prev();
+                            child: const Center(
+                                child: CircularProgressIndicator()))
+                        : CarouselSlider.builder(
+                            itemCount: page.list.length,
+                            itemBuilder: (context, index, realIndex) {
+                              return Container(
+                                margin:
+                                    const EdgeInsets.symmetric(horizontal: 12),
+                                // color: Colors.red,
+                                child: InkWell(
+                                  onTap: () {
+                                    Get.to(
+                                        () => SecondScreen(
+                                              photo: page.list[index],
+                                            ),
+                                        duration:
+                                            const Duration(milliseconds: 300),
+                                        transition: Transition.fade);
+                                  },
+                                  child: Hero(
+                                    tag: '${page.list[index].id}',
+                                    child: Image.network(
+                                        'https://live.staticflickr.com/${page.list[index].server}/${page.list[index].id}_${page.list[index].secret}.jpg'),
+                                  ),
+                                ),
+                              );
+                            },
+                            options: CarouselOptions(
+                                height: Get.mediaQuery.size.height * 0.7,
+                                enableInfiniteScroll: false)),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Container(
+                          margin: const EdgeInsets.all(10),
+                          child: ElevatedButton.icon(
+                              onPressed: page.page.value == 1
+                                  ? null
+                                  : () {
+                                      page.prev();
+                                    },
+                              icon: const Icon(Icons.arrow_back_rounded),
+                              label: const Text('Back')),
+                        ),
+                        Text(page.page.value.toString()),
+                        Container(
+                          margin: const EdgeInsets.all(10),
+                          child: ElevatedButton.icon(
+                              onPressed: () {
+                                page.next();
                               },
-                        icon: const Icon(Icons.arrow_back_rounded),
-                        label: const Text('Back')),
-                  ),
-                ),
-                Obx(() => Text(page.page.value.toString())),
-                Container(
-                  margin: const EdgeInsets.all(10),
-                  child: ElevatedButton.icon(
-                      onPressed: () {
-                        page.next();
-                      },
-                      icon: const Icon(Icons.arrow_forward_rounded),
-                      label: const Text('Next')),
+                              icon: const Icon(Icons.arrow_forward_rounded),
+                              label: const Text('Next')),
+                        )
+                      ],
+                    )
+                  ],
                 )
-              ],
-            )
-          ],
+              : const Center(
+                  child: Text('Network unavailable'),
+                ),
         ),
       ),
     );
@@ -100,6 +102,7 @@ class _FirstScreenState extends State<FirstScreen> {
   @override
   void initState() {
     super.initState();
+    page.check();
     page.getImages();
   }
 }
